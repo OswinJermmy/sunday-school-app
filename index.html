@@ -291,7 +291,7 @@
     <div class="container">
         <div class="header">
             <h1>🏛️ Sunday School Accounting</h1>
-            <p>Manage your Sunday school finances with ease</p>
+            <p>Manage your Sunday school finances with Oze-ease</p>
         </div>
 
         <div class="nav-tabs">
@@ -306,19 +306,19 @@
             <div class="summary-cards">
                 <div class="summary-card">
                     <h3>Total Income</h3>
-                    <div class="amount" id="totalIncome">PKR 0.00</div>
+                    <div class="amount" id="totalIncome">₨0.00</div>
                 </div>
                 <div class="summary-card">
                     <h3>Total Expenses</h3>
-                    <div class="amount" id="totalExpenses">PKR 0.00</div>
+                    <div class="amount" id="totalExpenses">₨0.00</div>
                 </div>
                 <div class="summary-card">
                     <h3>Net Balance</h3>
-                    <div class="amount" id="netBalance">PKR 0.00</div>
+                    <div class="amount" id="netBalance">₨0.00</div>
                 </div>
                 <div class="summary-card">
                     <h3>This Week</h3>
-                    <div class="amount" id="weeklyTotal">PKR 0.00</div>
+                    <div class="amount" id="weeklyTotal">₨0.00</div>
                 </div>
             </div>
 
@@ -634,10 +634,10 @@
             const weeklyExpenses = weeklyTransactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
             const weeklyNet = weeklyIncome - weeklyExpenses;
 
-            document.getElementById('totalIncome').textContent = `PKR ${income.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
-            document.getElementById('totalExpenses').textContent = `PKR ${expenses.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
-            document.getElementById('netBalance').textContent = `PKR ${balance.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
-            document.getElementById('weeklyTotal').textContent = `PKR ${weeklyNet.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+            document.getElementById('totalIncome').textContent = `₨${income.toFixed(2)}`;
+            document.getElementById('totalExpenses').textContent = `₨${expenses.toFixed(2)}`;
+            document.getElementById('netBalance').textContent = `₨${balance.toFixed(2)}`;
+            document.getElementById('weeklyTotal').textContent = `₨${weeklyNet.toFixed(2)}`;
         }
 
         function loadRecentTransactions() {
@@ -650,7 +650,7 @@
                     <td>${t.description || t.category}</td>
                     <td>${t.category}</td>
                     <td class="${t.type === 'income' ? 'amount-positive' : 'amount-negative'}">
-                        ${t.type === 'income' ? '+' : '-'}PKR ${t.amount.toLocaleString('en-US', {minimumFractionDigits: 2})}
+                        ${t.type === 'income' ? '+' : '-'}₨${t.amount.toFixed(2)}
                     </td>
                     <td>${t.receipt ? '📎 Yes' : '❌ No'}</td>
                 </tr>
@@ -810,12 +810,151 @@
                 <div class="summary-cards">
                     <div class="summary-card">
                         <h3>Income</h3>
-                        <div class="amount">PKR ${reportData.summary.income.toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
+                        <div class="amount">₨${reportData.summary.income.toFixed(2)}</div>
                     </div>
                     <div class="summary-card">
                         <h3>Expenses</h3>
-                        <div class="amount">PKR ${reportData.summary.expenses.toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
+                        <div class="amount">₨${reportData.summary.expenses.toFixed(2)}</div>
                     </div>
                     <div class="summary-card">
                         <h3>Balance</h3>
-                        <div class="amount">PKR ${reportData.
+                        <div class="amount">₨${reportData.summary.balance.toFixed(2)}</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Utility functions
+        function saveTransactions() {
+            localStorage.setItem('transactions', JSON.stringify(transactions));
+        }
+
+        function showAlert(message, type) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.textContent = message;
+            
+            document.querySelector('.container').insertBefore(alertDiv, document.querySelector('.nav-tabs'));
+            
+            setTimeout(() => {
+                alertDiv.remove();
+            }, 5000);
+        }
+
+        function exportToExcel() {
+            const csvContent = "data:text/csv;charset=utf-8," + 
+                "Date,Type,Category,Amount (PKR),Description\n" +
+                transactions.map(t => 
+                    `${t.date},${t.type},${t.category},${t.amount},"${t.description || ''}"`
+                ).join("\n");
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "sunday_school_transactions.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function downloadBackup() {
+            const backup = {
+                transactions: transactions,
+                settings: settings,
+                receipts: uploadedReceipts,
+                timestamp: new Date().toISOString()
+            };
+
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backup, null, 2));
+            const link = document.createElement("a");
+            link.setAttribute("href", dataStr);
+            link.setAttribute("download", "sunday_school_backup.json");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function clearAllData() {
+            if (confirm('Are you sure you want to clear all data? This cannot be undone.')) {
+                transactions = [];
+                uploadedReceipts = {};
+                localStorage.removeItem('transactions');
+                updateDashboard();
+                loadRecentTransactions();
+                showAlert('All data cleared successfully!', 'success');
+            }
+        }
+
+        // Import/Export for data sharing
+        function setupImportHandler() {
+            document.getElementById('importFile').addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        try {
+                            const backup = JSON.parse(e.target.result);
+                            
+                            if (backup.transactions) {
+                                if (confirm('This will replace all current data. Continue?')) {
+                                    transactions = backup.transactions;
+                                    if (backup.settings) settings = backup.settings;
+                                    if (backup.receipts) uploadedReceipts = backup.receipts;
+                                    
+                                    saveTransactions();
+                                    localStorage.setItem('settings', JSON.stringify(settings));
+                                    updateDashboard();
+                                    loadRecentTransactions();
+                                    loadSettings();
+                                    
+                                    showAlert(`Imported ${backup.transactions.length} transactions successfully!`, 'success');
+                                }
+                            } else {
+                                showAlert('Invalid backup file format', 'danger');
+                            }
+                        } catch (error) {
+                            showAlert('Error reading backup file', 'danger');
+                        }
+                    };
+                    reader.readAsText(file);
+                }
+            });
+        }
+
+        // Enhanced sync with display
+        function syncToGoogleSheets() {
+            if (!settings.sheetId) {
+                showAlert('Please configure Google Sheets settings first', 'danger');
+                return;
+            }
+
+            try {
+                const sheetData = [
+                    ['Date', 'Type', 'Category', 'Amount (PKR)', 'Description', 'Receipt', 'EnteredBy', 'Timestamp'],
+                    ...transactions.map(t => [
+                        t.date,
+                        t.type,
+                        t.category,
+                        t.amount,
+                        t.description || '',
+                        t.receipt ? 'Yes' : 'No',
+                        'User-' + Math.random().toString(36).substr(2, 5),
+                        new Date().toISOString()
+                    ])
+                ];
+
+                const csvContent = sheetData.map(row => row.join(',')).join('\n');
+                
+                document.getElementById('syncData').value = csvContent;
+                document.getElementById('syncInstructions').style.display = 'block';
+                
+                showAlert('Data prepared for Google Sheets! See instructions below.', 'success');
+                
+            } catch (error) {
+                console.error('Sync error:', error);
+                showAlert('Failed to prepare sync data', 'danger');
+            }
+        }
+    </script>
+</body>
+</html>
