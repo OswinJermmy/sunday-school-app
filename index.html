@@ -322,7 +322,35 @@
             
             // Auto-sync if configured
             if (settings.sheetId && settings.apiKey) {
-                syncToGoogleSheets();
+                async function syncToGoogleSheets() {
+    const sheetId = document.getElementById('sheetId').value || "1SG8s_E2QK-51m34RcWQagcN4zU4uuVHyVfFiLkTXNFY";
+    const apiKey = document.getElementById('apiKey').value || "AIzaSyBmtChTty7xm6dC70Wve5NQyUwox3m6JCs";
+    
+    try {
+        // 1. Prepare data
+        const values = [
+            ["Date", "Type", "Category", "Amount (PKR)", "Description"],
+            ...transactions.map(t => [
+                t.date,
+                t.type,
+                t.category,
+                t.amount,
+                t.description || ''
+            ])
+        ];
+
+        // 2. Send to Google Sheets
+        const response = await axios.post(
+            `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/Sheet1!A1:append?valueInputOption=USER_ENTERED&key=${apiKey}`,
+            { values }
+        );
+
+        showAlert('✅ Data saved to Google Sheets!', 'success');
+    } catch (error) {
+        console.error("Error:", error);
+        showAlert(`❌ Sync failed: ${error.response?.data?.error?.message || "Check console"}`, 'danger');
+    }
+};
             }
         }
 
@@ -419,7 +447,35 @@
         }
 
         // Google Sheets integration
-        async function syncToGoogleSheets() {
+            async function async function syncToGoogleSheets() {
+    const sheetId = document.getElementById('sheetId').value || "1SG8s_E2QK-51m34RcWQagcN4zU4uuVHyVfFiLkTXNFY";
+    const apiKey = document.getElementById('apiKey').value || "AIzaSyBmtChTty7xm6dC70Wve5NQyUwox3m6JCs";
+    
+    try {
+        // 1. Prepare data
+        const values = [
+            ["Date", "Type", "Category", "Amount (PKR)", "Description"],
+            ...transactions.map(t => [
+                t.date,
+                t.type,
+                t.category,
+                t.amount,
+                t.description || ''
+            ])
+        ];
+
+        // 2. Send to Google Sheets
+        const response = await axios.post(
+            `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/Sheet1!A1:append?valueInputOption=USER_ENTERED&key=${apiKey}`,
+            { values }
+        );
+
+        showAlert('✅ Data saved to Google Sheets!', 'success');
+    } catch (error) {
+        console.error("Error:", error);
+        showAlert(`❌ Sync failed: ${error.response?.data?.error?.message || "Check console"}`, 'danger');
+    }
+} {
             const sheetId = document.getElementById('sheetId').value;
             const apiKey = document.getElementById('apiKey').value;
             
