@@ -420,7 +420,28 @@
 
         // Google Sheets integration
         async function syncToGoogleSheets() {
-            const sheetId = document.getElementById('sheetId').value;
+              const webAppUrl = 'PASTE_YOUR_WEB_APP_URL_HERE'; // replace with actual
+
+  try {
+    for (let t of transactions) {
+      const payload = {
+        date: t.date,
+        type: t.type,
+        category: t.category,
+        amount: t.amount,
+        description: t.description || '',
+        receipt: t.receipt ? 'Yes' : 'No',
+        timestamp: t.timestamp
+      };
+
+      await axios.post(webAppUrl, payload);
+    }
+
+    showAlert('Data synced to Google Sheets using Web App!', 'success');
+  } catch (error) {
+    console.error('Web App sync error:', error);
+    showAlert('Web App sync failed: ' + error.message, 'danger');}}          
+        const sheetId = document.getElementById('sheetId').value;
             const apiKey = document.getElementById('apiKey').value;
             
             if (!sheetId || !apiKey) {
@@ -453,7 +474,7 @@
 
                 // Write new data
                 await axios.post(
-                    `https://sheets.googleapis.com/v4/spreadsheets/${1SG8s_E2QK-51m34RcWQagcN4zU4uuVHyVfFiLkTXNFY}/values/A1:append?valueInputOption=USER_ENTERED&key=${AIzaSyBmtChTty7xm6dC70Wve5NQyUwox3m6JCs}`,
+                    `  https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/A1:Z1000:clear?key=${apiKey}`,
                     { values, majorDimension: "ROWS" },
                     { headers: { 'Content-Type': 'application/json' } }
                 );
@@ -477,7 +498,7 @@
 
             try {
                 const response = await axios.get(
-                    `https://sheets.googleapis.com/v4/spreadsheets/${1SG8s_E2QK-51m34RcWQagcN4zU4uuVHyVfFiLkTXNFY}?key=${AIzaSyBmtChTty7xm6dC70Wve5NQyUwox3m6JCs}`
+                    `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}?key=${apiKey}`
                 );
                 showAlert('Connection successful! Sheet title: ' + response.data.properties.title, 'success');
             } catch (error) {
