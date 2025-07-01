@@ -321,7 +321,7 @@
             clearForm();
             
             // Auto-sync if configured
-            if (settings.1SG8s_E2QK-51m34RcWQagcN4zU4uuVHyVfFiLkTXNFY && settings.AIzaSyBmtChTty7xm6dC70Wve5NQyUwox3m6JCs) {
+            if (settings.sheetId && settings.apiKey) {
                 syncToGoogleSheets();
             }
         }
@@ -420,8 +420,8 @@
 
         // Google Sheets integration
         async function syncToGoogleSheets() {
-            const sheetId = document.getElementById('1SG8s_E2QK-51m34RcWQagcN4zU4uuVHyVfFiLkTXNFY').value;
-            const apiKey = document.getElementById('AIzaSyBmtChTty7xm6dC70Wve5NQyUwox3m6JCs').value;
+            const sheetId = document.getElementById('sheetId').value;
+            const apiKey = document.getElementById('apiKey').value;
             
             if (!sheetId || !apiKey) {
                 showAlert('Please configure Google Sheets settings first', 'danger');
@@ -446,14 +446,14 @@
 
                 // Clear existing data
                 await axios.post(
-                    `https://sheets.googleapis.com/v4/spreadsheets/${1SG8s_E2QK-51m34RcWQagcN4zU4uuVHyVfFiLkTXNFY}/values/A1:Z1000:clear?key=${1SG8s_E2QK-51m34RcWQagcN4zU4uuVHyVfFiLkTXNFY}`,
+                    `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/A1:Z1000:clear?key=${apiKey}`,
                     {},
                     { headers: { 'Content-Type': 'application/json' } }
                 );
 
                 // Write new data
                 await axios.post(
-                    `https://sheets.googleapis.com/v4/spreadsheets/${1SG8s_E2QK-51m34RcWQagcN4zU4uuVHyVfFiLkTXNFY}/values/A1:append?valueInputOption=USER_ENTERED&key=${AIzaSyBmtChTty7xm6dC70Wve5NQyUwox3m6JCs}`,
+                    `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/A1:append?valueInputOption=USER_ENTERED&key=${apiKey}`,
                     { values, majorDimension: "ROWS" },
                     { headers: { 'Content-Type': 'application/json' } }
                 );
@@ -477,7 +477,7 @@
 
             try {
                 const response = await axios.get(
-                    `https://sheets.googleapis.com/v4/spreadsheets/${1SG8s_E2QK-51m34RcWQagcN4zU4uuVHyVfFiLkTXNFY}?key=${AIzaSyBmtChTty7xm6dC70Wve5NQyUwox3m6JCs}`
+                    `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}?key=${apiKey}`
                 );
                 showAlert('Connection successful! Sheet title: ' + response.data.properties.title, 'success');
             } catch (error) {
