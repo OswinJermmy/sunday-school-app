@@ -1,8 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <script src="https://accounts.google.com/gsi/client"></script>
-    <script src="https://apis.google.com/js/api.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sunday School Accounting System</title>
@@ -324,35 +322,7 @@
             
             // Auto-sync if configured
             if (settings.sheetId && settings.apiKey) {
-                async function syncToGoogleSheets() {
-    const sheetId = document.getElementById('sheetId').value || "1SG8s_E2QK-51m34RcWQagcN4zU4uuVHyVfFiLkTXNFY";
-    const apiKey = document.getElementById('apiKey').value || "AIzaSyBmtChTty7xm6dC70Wve5NQyUwox3m6JCs";
-    
-    try {
-        // 1. Prepare data
-        const values = [
-            ["Date", "Type", "Category", "Amount (PKR)", "Description"],
-            ...transactions.map(t => [
-                t.date,
-                t.type,
-                t.category,
-                t.amount,
-                t.description || ''
-            ])
-        ];
-
-        // 2. Send to Google Sheets
-        const response = await axios.post(
-            `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/Sheet1!A1:append?valueInputOption=USER_ENTERED&key=${apiKey}`,
-            { values }
-        );
-
-        showAlert('✅ Data saved to Google Sheets!', 'success');
-    } catch (error) {
-        console.error("Error:", error);
-        showAlert(`❌ Sync failed: ${error.response?.data?.error?.message || "Check console"}`, 'danger');
-    }
-};
+                syncToGoogleSheets();
             }
         }
 
@@ -449,65 +419,7 @@
         }
 
         // Google Sheets integration
-            let tokenClient;
-
-async function initGoogleAuth() {
-    tokenClient = google.accounts.oauth2.initTokenClient({
-        client_id: 'YOUR_CLIENT_ID.apps.googleusercontent.com',
-        scope: 'https://www.googleapis.com/auth/spreadsheets',
-        callback: (tokenResponse) => {
-            if (tokenResponse && tokenResponse.access_token) {
-                syncDataToSheets();
-            }
-        },
-    });
-}
-
-async function syncToGoogleSheets() {
-    if (!tokenClient) await initGoogleAuth();
-    tokenClient.requestAccessToken();
-}
-
-async function syncDataToSheets() {
-    const sheetId = document.getElementById('sheetId').value;
-    try {
-        const values = [
-            ["Date", "Type", "Category", "Amount (PKR)", "Description"],
-            ...transactions.map(t => [
-                t.date,
-                t.type,
-                t.category,
-                t.amount,
-                t.description || ''
-            ])
-        ];
-
-        await gapi.client.sheets.spreadsheets.values.append({
-            spreadsheetId: sheetId,
-            range: "Sheet1!A1",
-            valueInputOption: "USER_ENTERED",
-            resource: { values }
-        });
-        
-        showAlert('✅ Synced to Google Sheets!', 'success');
-    } catch (error) {
-        console.error("Error:", error);
-        showAlert(`❌ Sync failed: ${error.result?.error?.message || error.message}`, 'danger');
-    }
-}
-
-        // 2. Send to Google Sheets
-        const response = await axios.post(
-            `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/Sheet1!A1:append?valueInputOption=USER_ENTERED&key=${apiKey}`,
-            { values }
-        );
-
-        showAlert('✅ Data saved to Google Sheets!', 'success');
-    } catch (error) {
-        console.error("Error:", error);
-        showAlert(`❌ Sync failed: ${error.response?.data?.error?.message || "Check console"}`, 'danger');
-    }
-} {
+        async function syncToGoogleSheets() {
             const sheetId = document.getElementById('sheetId').value;
             const apiKey = document.getElementById('apiKey').value;
             
