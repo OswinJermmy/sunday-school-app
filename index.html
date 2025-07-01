@@ -446,14 +446,14 @@
 
                 // Clear existing data
                 await axios.post(
-                    `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/A1:Z1000:clear?key=${apiKey}`,
+                    `https://sheets.googleapis.com/v4/spreadsheets/${1SG8s_E2QK-51m34RcWQagcN4zU4uuVHyVfFiLkTXNFY}/values/A1:Z1000:clear?key=${1SG8s_E2QK-51m34RcWQagcN4zU4uuVHyVfFiLkTXNFY}`,
                     {},
                     { headers: { 'Content-Type': 'application/json' } }
                 );
 
                 // Write new data
                 await axios.post(
-                    `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/A1:append?valueInputOption=USER_ENTERED&key=${apiKey}`,
+                    `https://sheets.googleapis.com/v4/spreadsheets/${1SG8s_E2QK-51m34RcWQagcN4zU4uuVHyVfFiLkTXNFY}/values/A1:append?valueInputOption=USER_ENTERED&key=${AIzaSyBmtChTty7xm6dC70Wve5NQyUwox3m6JCs}`,
                     { values, majorDimension: "ROWS" },
                     { headers: { 'Content-Type': 'application/json' } }
                 );
@@ -477,7 +477,7 @@
 
             try {
                 const response = await axios.get(
-                    `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}?key=${apiKey}`
+                    `https://sheets.googleapis.com/v4/spreadsheets/${1SG8s_E2QK-51m34RcWQagcN4zU4uuVHyVfFiLkTXNFY}?key=${AIzaSyBmtChTty7xm6dC70Wve5NQyUwox3m6JCs}`
                 );
                 showAlert('Connection successful! Sheet title: ' + response.data.properties.title, 'success');
             } catch (error) {
