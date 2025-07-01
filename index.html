@@ -471,13 +471,30 @@
                     {},
                     { headers: { 'Content-Type': 'application/json' } }
                 );
+async function syncToGoogleSheets() {
+  const webAppUrl = 'https://script.google.com/macros/s/AKfycbzdPH4Qn-VTRc8ejETiqyVVYvdiKP0DnWuPU16Al16C3Ygs9BBHALa32lnmlRYWS9vS/exec'; // replace with actual
 
-                // Write new data
-                await axios.post(
-                    `  https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/A1:Z1000:clear?key=${apiKey}`,
-                    { values, majorDimension: "ROWS" },
-                    { headers: { 'Content-Type': 'application/json' } }
-                );
+  try {
+    for (let t of transactions) {
+      const payload = {
+        date: t.date,
+        type: t.type,
+        category: t.category,
+        amount: t.amount,
+        description: t.description || '',
+        receipt: t.receipt ? 'Yes' : 'No',
+        timestamp: t.timestamp
+      };
+
+      await axios.post(webAppUrl, payload);
+    }
+
+    showAlert('Data synced to Google Sheets using Web App!', 'success');
+  } catch (error) {
+    console.error('Web App sync error:', error);
+    showAlert('Web App sync failed: ' + error.message, 'danger');
+  }
+}
 
                 showAlert('Data successfully synced to Google Sheets!', 'success');
                 
